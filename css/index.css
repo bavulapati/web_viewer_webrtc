@@ -1,0 +1,13 @@
+body {
+    font-family: sans-serif;
+  }
+  
+  video {
+    background-color: red !important;
+    max-width: 100%;
+    width: 1040px;
+    height: 585px;
+    max-height: 90%;
+    object-fit: fill;
+  }
+  
