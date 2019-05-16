@@ -1,9 +1,10 @@
+
 console.log('Launching Viewer');
 
 const room: string = 'session';
 let client: string;
 // tslint:disable-next-line: no-http-string
-const socket: SocketIOClient.Socket = io('http://192.168.3.92:8080');
+const socket: SocketIOClient.Socket = io('http://ec2-52-221-240-156.ap-southeast-1.compute.amazonaws.com:8080');
 
 // Define initial start time of the call (defined as connection between peers).
 let startTime: number | undefined;
@@ -51,7 +52,7 @@ hangupButton.addEventListener('click', hangupAction);
 function hangupAction(): void {
     disableRemoteMouseAndKeyBoard();
     socket.emit(socketMessages.hangUp, room, client);
-    socket.close();
+    //socket.close();
     receiveChannel.close();
     console.log(`Closed data channel with label: ${receiveChannel.label}`);
     if (remotePeerConnection !== undefined) { remotePeerConnection.close(); }
@@ -59,6 +60,7 @@ function hangupAction(): void {
     hangupButton.disabled = true;
     callButton.disabled = false;
     console.log('Ending call.');
+    remoteVideo.srcObject = null;
 }
 
 socket.on('connect', () => {
@@ -248,7 +250,10 @@ function callAction(): void {
     // Allows for RTC server configuration.
     const servers: RTCConfiguration = {
         iceServers: [{
-            urls: ['stun:stun.l.google.com:19302']
+          //  urls: ['stun:stun.l.google.com:19302']
+	 urls: ['turn:ec2-54-169-187-87.ap-southeast-1.compute.amazonaws.com:3478'],
+	 username: 'bmr-turn-user',
+         credential: 'insecure-key'
         }]
     };
 
