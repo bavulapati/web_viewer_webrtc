@@ -3,10 +3,9 @@ body {
   }
   
   video {
-    background-color: red !important;
+    background-color: black !important;
     max-width: 100%;
-    width: 1040px;
-    height: 585px;
+    height: 1080px;
     max-height: 90%;
     object-fit: fill;
   }

@@ -1,7 +1,7 @@
 
 console.log('Launching Viewer');
 
-const room: string = 'session';
+let room: string;
 let client: string;
 // tslint:disable-next-line: no-http-string
 const socket: SocketIOClient.Socket = io('http://ec2-52-221-240-156.ap-southeast-1.compute.amazonaws.com:8080');
@@ -37,6 +37,7 @@ const socketMessages: SocketMessages = new SocketMessages();
 
 // Define and add behavior to buttons.
 // Define action buttons.
+const roomInput: HTMLInputElement = <HTMLInputElement> document.getElementById('roomName');
 const callButton: HTMLButtonElement = <HTMLButtonElement>document.getElementById('callButton');
 const hangupButton: HTMLButtonElement = <HTMLButtonElement>document.getElementById('hangupButton');
 
@@ -60,12 +61,12 @@ function hangupAction(): void {
     hangupButton.disabled = true;
     callButton.disabled = false;
     console.log('Ending call.');
+    // tslint:disable-next-line: no-null-keyword
     remoteVideo.srcObject = null;
 }
 
 socket.on('connect', () => {
     console.log('socket connected');
-    socket.emit('create or join', room);
 });
 
 socket.on(socketMessages.message, (statement: string) => { console.log(statement); });
@@ -238,6 +239,8 @@ function calculateRemoteCoordinates(videoOffsetX: number, videoOffsetY: number):
 
 // Handles call button action: creates peer connection.
 function callAction(): void {
+    room = roomInput.value.trim();
+    socket.emit(socketMessages.createOrJoinRoom, room);
     callButton.disabled = true;
     hangupButton.disabled = false;
 
@@ -250,10 +253,10 @@ function callAction(): void {
     // Allows for RTC server configuration.
     const servers: RTCConfiguration = {
         iceServers: [{
-          //  urls: ['stun:stun.l.google.com:19302']
-	 urls: ['turn:ec2-54-169-187-87.ap-southeast-1.compute.amazonaws.com:3478'],
-	 username: 'bmr-turn-user',
-         credential: 'insecure-key'
+            //  urls: ['stun:stun.l.google.com:19302']
+            urls: ['turn:ec2-54-169-187-87.ap-southeast-1.compute.amazonaws.com:3478'],
+            username: 'bmr-turn-user',
+            credential: 'insecure-key'
         }]
     };
 
