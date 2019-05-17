@@ -42,10 +42,11 @@ const callButton: HTMLButtonElement = <HTMLButtonElement>document.getElementById
 const hangupButton: HTMLButtonElement = <HTMLButtonElement>document.getElementById('hangupButton');
 
 // Set up initial action buttons status: disable call and hangup.
-// callButton.disabled = true;
+callButton.disabled = true;
 hangupButton.disabled = true;
 
 // Add click event handlers for buttons.
+roomInput.addEventListener('input', enableCallButtionOnValidInput);
 callButton.addEventListener('click', callAction);
 hangupButton.addEventListener('click', hangupAction);
 
@@ -75,6 +76,7 @@ socket.on(socketMessages.created, (roomName: string, clientId: string) => {
     console.log(`Created a room as ${roomName} and joined as ${clientId}`);
     client = clientId;
     callButton.disabled = false;  // Enable call button.
+    callThePeer();
 });
 
 socket.on(socketMessages.full, (roomName: string) => {
@@ -85,6 +87,7 @@ socket.on(socketMessages.joined, (roomName: string, clientId: string) => {
     console.log(`viewer Joined room ${roomName} as ${clientId}`);
     client = clientId;
     callButton.disabled = false;  // Enable call button.
+    callThePeer();
 });
 
 socket.on(socketMessages.iceCandidate, (iceCandidate: ICandidateMsg) => {
@@ -237,13 +240,7 @@ function calculateRemoteCoordinates(videoOffsetX: number, videoOffsetY: number):
     };
 }
 
-// Handles call button action: creates peer connection.
-function callAction(): void {
-    room = roomInput.value.trim();
-    socket.emit(socketMessages.createOrJoinRoom, room);
-    callButton.disabled = true;
-    hangupButton.disabled = false;
-
+function callThePeer(): void {
     console.log('Starting call.');
 
     socket.emit(socketMessages.startCall, room, client);   // Send a message to host for initializing call
@@ -270,7 +267,21 @@ function callAction(): void {
     remotePeerConnection.addEventListener('icecandidate', handleConnection);
     remotePeerConnection.addEventListener('iceconnectionstatechange', handleConnectionChange);
     remotePeerConnection.addEventListener('track', gotRemoteMediaStream);
+}
 
+function enableCallButtionOnValidInput(): void {
+    if (roomInput.value.trim().length > 7) {
+        callButton.disabled = false;
+        hangupButton.disabled = true;
+    }
+}
+
+// Handles call button action: creates peer connection.
+function callAction(): void {
+    room = roomInput.value.trim();
+    socket.emit(socketMessages.createOrJoinRoom, room);
+    callButton.disabled = true;
+    hangupButton.disabled = false;
 }
 
 function receiveChannelCallback(event: RTCDataChannelEvent): void {
