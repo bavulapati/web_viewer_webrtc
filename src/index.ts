@@ -42,7 +42,7 @@ const callButton: HTMLButtonElement = <HTMLButtonElement>document.getElementById
 const hangupButton: HTMLButtonElement = <HTMLButtonElement>document.getElementById('hangupButton');
 
 // Set up initial action buttons status: disable call and hangup.
-callButton.disabled = true;
+// callButton.disabled = true;
 hangupButton.disabled = true;
 
 // Add click event handlers for buttons.
