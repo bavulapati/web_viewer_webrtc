@@ -37,7 +37,7 @@ const socketMessages: SocketMessages = new SocketMessages();
 
 // Define and add behavior to buttons.
 // Define action buttons.
-const roomInput: HTMLInputElement = <HTMLInputElement> document.getElementById('roomName');
+const roomInput: HTMLInputElement = <HTMLInputElement>document.getElementById('roomName');
 const callButton: HTMLButtonElement = <HTMLButtonElement>document.getElementById('callButton');
 const hangupButton: HTMLButtonElement = <HTMLButtonElement>document.getElementById('hangupButton');
 
@@ -54,7 +54,7 @@ hangupButton.addEventListener('click', hangupAction);
 function hangupAction(): void {
     disableRemoteMouseAndKeyBoard();
     socket.emit(socketMessages.hangUp, room, client);
-    //socket.close();
+    socket.close();
     receiveChannel.close();
     console.log(`Closed data channel with label: ${receiveChannel.label}`);
     if (remotePeerConnection !== undefined) { remotePeerConnection.close(); }
@@ -384,7 +384,6 @@ remoteVideo.addEventListener('onresize', logResizedVideo);
 
 // Logs offer creation and sets peer connection session descriptions.
 function receivedRemoteOffer(description: RTCSessionDescriptionInit): void {
-
     console.log('remotePeerConnection setRemoteDescription start.');
     if (remotePeerConnection !== undefined) {
         remotePeerConnection.setRemoteDescription(new RTCSessionDescription(description))
