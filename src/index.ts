@@ -1,8 +1,6 @@
-
 console.log('Launching Viewer');
 
 let room: string;
-let client: string;
 // tslint:disable-next-line: no-http-string
 const socket: SocketIOClient.Socket = io('http://ec2-52-221-240-156.ap-southeast-1.compute.amazonaws.com:8080');
 
@@ -53,7 +51,7 @@ hangupButton.addEventListener('click', hangupAction);
 // Handles hangup action: ends up call, closes connections and resets peers.
 function hangupAction(): void {
     disableRemoteMouseAndKeyBoard();
-    socket.emit(socketMessages.hangUp, room, client);
+    socket.emit(socketMessages.hangUp, room);
     socket.close();
     receiveChannel.close();
     console.log(`Closed data channel with label: ${receiveChannel.label}`);
@@ -72,9 +70,8 @@ socket.on('connect', () => {
 
 socket.on(socketMessages.message, (statement: string) => { console.log(statement); });
 
-socket.on(socketMessages.created, (roomName: string, clientId: string) => {
-    console.log(`Created a room as ${roomName} and joined as ${clientId}`);
-    client = clientId;
+socket.on(socketMessages.created, (roomName: string) => {
+    console.log(`Created a room as ${roomName} and joined`);
     callButton.disabled = false;  // Enable call button.
     callThePeer();
 });
@@ -83,14 +80,13 @@ socket.on(socketMessages.full, (roomName: string) => {
     console.log(`Message from client: Room ${roomName} is full :^(`);
 });
 
-socket.on(socketMessages.joined, (roomName: string, clientId: string) => {
-    console.log(`viewer Joined room ${roomName} as ${clientId}`);
-    client = clientId;
+socket.on(socketMessages.joined, (roomName: string) => {
+    console.log(`viewer Joined room ${roomName}`);
     callButton.disabled = false;  // Enable call button.
     callThePeer();
 });
 
-socket.on(socketMessages.iceCandidate, (iceCandidate: ICandidateMsg) => {
+socket.on(socketMessages.iceCandidate, (iceCandidate: IIceCandidateMsg) => {
     console.log(`viewer received ${socketMessages.iceCandidate} as : `, iceCandidate);
     receivedRemoteIceCandidate(iceCandidate);
 });
@@ -243,7 +239,7 @@ function calculateRemoteCoordinates(videoOffsetX: number, videoOffsetY: number):
 function callThePeer(): void {
     console.log('Starting call.');
 
-    socket.emit(socketMessages.startCall, room, client);   // Send a message to host for initializing call
+    socket.emit(socketMessages.startCall, room);   // Send a message to host for initializing call
 
     startTime = window.performance.now();
 
@@ -309,19 +305,19 @@ function handleConnection(event: RTCPeerConnectionIceEvent): void {
     const iceCandidate: RTCIceCandidate | null = <RTCIceCandidate>event.candidate;
 
     if (iceCandidate !== null && iceCandidate.sdpMid !== null && iceCandidate.sdpMLineIndex !== null) {
-        const candidateMsg: ICandidateMsg = {
+        const candidateMsg: IIceCandidateMsg = {
             candidate: iceCandidate.candidate,
             id: iceCandidate.sdpMid,
             label: iceCandidate.sdpMLineIndex
         };
 
-        socket.emit(socketMessages.iceCandidate, candidateMsg, room, client);
+        socket.emit(socketMessages.iceCandidate, candidateMsg, room);
 
         console.log(`viewer ICE candidate:\n${iceCandidate.candidate}.`);
     }
 }
 
-function receivedRemoteIceCandidate(rTCIceCandidateInit: ICandidateMsg): void {
+function receivedRemoteIceCandidate(rTCIceCandidateInit: IIceCandidateMsg): void {
     if (rTCIceCandidateInit !== undefined) {
 
         const newIceCandidate: RTCIceCandidate = new RTCIceCandidate({
@@ -413,7 +409,7 @@ function createdAnswer(description: RTCSessionDescriptionInit): void {
             .catch(setSessionDescriptionError);
     }
 
-    socket.emit(socketMessages.answer, description, room, client);
+    socket.emit(socketMessages.answer, description, room);
 }
 
 // Logs success when setting session description.
@@ -433,21 +429,4 @@ function setSessionDescriptionError(error: Error): void {
 // Logs success when remoteDescription is set.
 function setRemoteDescriptionSuccess(): void {
     setDescriptionSuccess('setRemoteDescription');
-}
-
-interface IMouseCoordinates {
-    x: number;
-    y: number;
-}
-
-interface IEventData extends IMouseCoordinates {
-    eventType: string;
-    button: number;
-    keyCode: string;
-}
-
-interface ICandidateMsg {
-    label: number;
-    id: string;
-    candidate: string;
 }
