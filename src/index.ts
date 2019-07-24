@@ -1,8 +1,32 @@
 console.log('Launching Viewer');
 
+interface IBmrUtilityResponse {
+    user_name: string;
+    bmr_serial_key: string;
+    access_token: string;
+    remote_disabled: number;
+}
+
+const bmrUtilityResponse: IBmrUtilityResponse = {
+    user_name: 'vinaybmr@myworld.com',
+    bmr_serial_key: 'BMR-SERIAL-KEY30',
+    access_token: 'lifetime_host_access_token',
+    remote_disabled: 0
+};
+
+interface IConnectionQuery {
+    accessToken: string;
+    userName: string;
+}
+
+const connectionQuery: IConnectionQuery = {
+    accessToken: bmrUtilityResponse.access_token,
+    userName: bmrUtilityResponse.user_name
+};
+
 let room: string;
 // tslint:disable-next-line: no-http-string
-const socket: SocketIOClient.Socket = io('http://ec2-52-221-240-156.ap-southeast-1.compute.amazonaws.com:8080');
+const socket: SocketIOClient.Socket = io('http://ec2-52-221-240-156.ap-southeast-1.compute.amazonaws.com:8080', { query: connectionQuery });
 
 // Define initial start time of the call (defined as connection between peers).
 let startTime: number | undefined;
@@ -29,6 +53,7 @@ class SocketMessages {
     public readonly join: string = 'join';
     public readonly ready: string = 'ready';
     public readonly full: string = 'full';
+    public readonly serverList: string = 'server-list';
 }
 
 const socketMessages: SocketMessages = new SocketMessages();
@@ -66,6 +91,25 @@ function hangupAction(): void {
 
 socket.on('connect', () => {
     console.log('socket connected');
+});
+
+enum ServerStatus {
+    online,
+    offline,
+    insession,
+    disabled
+}
+
+interface IBmrServer {
+    id: number;
+    name: string;
+    serialKey: string;
+    status: ServerStatus;
+}
+
+socket.on(socketMessages.serverList, (servers: IBmrServer[]) => {
+    console.log('on serverlist');
+    console.log(JSON.stringify(servers));
 });
 
 socket.on(socketMessages.message, (statement: string) => { console.log(statement); });
