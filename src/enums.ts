@@ -16,3 +16,10 @@ enum SocketMessages {
     full = 'full',
     serverList = 'server-list'
 }
+
+enum ServerStatus {
+    online,
+    offline,
+    insession,
+    disabled
+}

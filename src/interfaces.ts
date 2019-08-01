@@ -26,3 +26,10 @@ interface IConnectionQuery {
     accessToken: string;
     userName: string;
 }
+
+interface IBmrServer {
+    id: number;
+    name: string;
+    serialKey: string;
+    status: ServerStatus;
+}
