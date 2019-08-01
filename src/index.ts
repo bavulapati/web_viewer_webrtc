@@ -30,83 +30,10 @@ socket.on('disconnect', () => {
 // Define initial start time of the call (defined as connection between peers).
 let startTime: number | undefined;
 
-const remoteVideo: HTMLVideoElement = <HTMLVideoElement>document.querySelector('video');
-
 let remoteStream: MediaStream;
 
 let remotePeerConnection: RTCPeerConnection | undefined;
 let receiveChannel: RTCDataChannel;
-
-// Define and add behavior to buttons.
-// Define action buttons.
-const roomInput: HTMLInputElement = <HTMLInputElement>document.getElementById('roomName');
-const callButton: HTMLButtonElement = <HTMLButtonElement>document.getElementById('callButton');
-const hangupButton: HTMLButtonElement = <HTMLButtonElement>document.getElementById('hangupButton');
-
-// Set up initial action buttons status: disable call and hangup.
-callButton.disabled = true;
-hangupButton.disabled = true;
-
-// Add click event handlers for buttons.
-roomInput.addEventListener('input', enableCallButtionOnValidInput);
-callButton.addEventListener('click', callAction);
-hangupButton.addEventListener('click', hangupAction);
-
-function enableCallButtionOnValidInput(): void {
-    if (roomInput.value.trim().length > 7) {
-        callButton.disabled = false;
-        hangupButton.disabled = true;
-    }
-}
-
-// Handles hangup action: ends up call, closes connections and resets peers.
-function hangupAction(): void {
-    disableRemoteMouseAndKeyBoard();
-    socket.emit(SocketMessages.hangUp, room);
-    socket.close();
-    receiveChannel.close();
-    console.log(`Closed data channel with label: ${receiveChannel.label}`);
-    if (remotePeerConnection !== undefined) { remotePeerConnection.close(); }
-    remotePeerConnection = undefined;
-    hangupButton.disabled = true;
-    callButton.disabled = false;
-    console.log('Ending call.');
-    // tslint:disable-next-line: no-null-keyword
-    remoteVideo.srcObject = null;
-}
-
-// socket.on(SocketMessages.serverList, (servers: IBmrServer[]) => {
-//     console.log('on serverlist');
-//     console.log(JSON.stringify(servers));
-// });
-
-// socket.on(SocketMessages.message, (statement: string) => { console.log(statement); });
-
-// socket.on(SocketMessages.created, (roomName: string) => {
-//     console.log(`Created a room as ${roomName} and joined`);
-//     callButton.disabled = false;  // Enable call button.
-//     callThePeer();
-// });
-
-// socket.on(SocketMessages.full, (roomName: string) => {
-//     console.log(`Message from client: Room ${roomName} is full :^(`);
-// });
-
-// socket.on(SocketMessages.joined, (roomName: string) => {
-//     console.log(`viewer Joined room ${roomName}`);
-//     callButton.disabled = false;  // Enable call button.
-//     callThePeer();
-// });
-
-// socket.on(SocketMessages.iceCandidate, (iceCandidate: IIceCandidateMsg) => {
-//     console.log(`viewer received ${SocketMessages.iceCandidate} as : `, iceCandidate);
-//     receivedRemoteIceCandidate(iceCandidate);
-// });
-
-// socket.on(SocketMessages.offer, (description: RTCSessionDescriptionInit) => {
-//     console.log(`viewer received ${SocketMessages.offer} as : `, description);
-//     receivedRemoteOffer(description);
-// });
 
 // Define MediaStreams callbacks.
 
@@ -275,14 +202,6 @@ function callThePeer(): void {
     remotePeerConnection.addEventListener('icecandidate', handleConnection);
     remotePeerConnection.addEventListener('iceconnectionstatechange', handleConnectionChange);
     remotePeerConnection.addEventListener('track', gotRemoteMediaStream);
-}
-
-// Handles call button action: creates peer connection.
-function callAction(): void {
-    room = roomInput.value.trim();
-    socket.emit(SocketMessages.createOrJoinRoom, room);
-    callButton.disabled = true;
-    hangupButton.disabled = false;
 }
 
 function receiveChannelCallback(event: RTCDataChannelEvent): void {
