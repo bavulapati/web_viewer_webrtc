@@ -1,23 +1,11 @@
 console.log('Launching Viewer');
 
-interface IBmrUtilityResponse {
-    user_name: string;
-    bmr_serial_key: string;
-    access_token: string;
-    remote_disabled: number;
-}
-
 const bmrUtilityResponse: IBmrUtilityResponse = {
     user_name: 'vinaybmr@myworld.com',
     bmr_serial_key: 'BMR-SERIAL-KEY30',
     access_token: 'lifetime_host_access_token',
     remote_disabled: 0
 };
-
-interface IConnectionQuery {
-    accessToken: string;
-    userName: string;
-}
 
 const connectionQuery: IConnectionQuery = {
     accessToken: bmrUtilityResponse.access_token,
@@ -37,26 +25,6 @@ let remoteStream: MediaStream;
 
 let remotePeerConnection: RTCPeerConnection | undefined;
 let receiveChannel: RTCDataChannel;
-/**
- * List of messages to use with Socket
- */
-class SocketMessages {
-    public readonly message: string = 'message';
-    public readonly iceCandidate: string = 'ice-candidate';
-    public readonly offer: string = 'offer';
-    public readonly answer: string = 'answer';
-    public readonly startCall: string = 'start-call';
-    public readonly hangUp: string = 'hang-up';
-    public readonly createOrJoinRoom: string = 'create or join';
-    public readonly created: string = 'created';
-    public readonly joined: string = 'joined';
-    public readonly join: string = 'join';
-    public readonly ready: string = 'ready';
-    public readonly full: string = 'full';
-    public readonly serverList: string = 'server-list';
-}
-
-const socketMessages: SocketMessages = new SocketMessages();
 
 // Define and add behavior to buttons.
 // Define action buttons.
@@ -76,7 +44,7 @@ hangupButton.addEventListener('click', hangupAction);
 // Handles hangup action: ends up call, closes connections and resets peers.
 function hangupAction(): void {
     disableRemoteMouseAndKeyBoard();
-    socket.emit(socketMessages.hangUp, room);
+    socket.emit(SocketMessages.hangUp, room);
     socket.close();
     receiveChannel.close();
     console.log(`Closed data channel with label: ${receiveChannel.label}`);
@@ -107,36 +75,36 @@ interface IBmrServer {
     status: ServerStatus;
 }
 
-socket.on(socketMessages.serverList, (servers: IBmrServer[]) => {
+socket.on(SocketMessages.serverList, (servers: IBmrServer[]) => {
     console.log('on serverlist');
     console.log(JSON.stringify(servers));
 });
 
-socket.on(socketMessages.message, (statement: string) => { console.log(statement); });
+socket.on(SocketMessages.message, (statement: string) => { console.log(statement); });
 
-socket.on(socketMessages.created, (roomName: string) => {
+socket.on(SocketMessages.created, (roomName: string) => {
     console.log(`Created a room as ${roomName} and joined`);
     callButton.disabled = false;  // Enable call button.
     callThePeer();
 });
 
-socket.on(socketMessages.full, (roomName: string) => {
+socket.on(SocketMessages.full, (roomName: string) => {
     console.log(`Message from client: Room ${roomName} is full :^(`);
 });
 
-socket.on(socketMessages.joined, (roomName: string) => {
+socket.on(SocketMessages.joined, (roomName: string) => {
     console.log(`viewer Joined room ${roomName}`);
     callButton.disabled = false;  // Enable call button.
     callThePeer();
 });
 
-socket.on(socketMessages.iceCandidate, (iceCandidate: IIceCandidateMsg) => {
-    console.log(`viewer received ${socketMessages.iceCandidate} as : `, iceCandidate);
+socket.on(SocketMessages.iceCandidate, (iceCandidate: IIceCandidateMsg) => {
+    console.log(`viewer received ${SocketMessages.iceCandidate} as : `, iceCandidate);
     receivedRemoteIceCandidate(iceCandidate);
 });
 
-socket.on(socketMessages.offer, (description: RTCSessionDescriptionInit) => {
-    console.log(`viewer received ${socketMessages.offer} as : `, description);
+socket.on(SocketMessages.offer, (description: RTCSessionDescriptionInit) => {
+    console.log(`viewer received ${SocketMessages.offer} as : `, description);
     receivedRemoteOffer(description);
 });
 
@@ -283,7 +251,7 @@ function calculateRemoteCoordinates(videoOffsetX: number, videoOffsetY: number):
 function callThePeer(): void {
     console.log('Starting call.');
 
-    socket.emit(socketMessages.startCall, room);   // Send a message to host for initializing call
+    socket.emit(SocketMessages.startCall, room);   // Send a message to host for initializing call
 
     startTime = window.performance.now();
 
@@ -319,7 +287,7 @@ function enableCallButtionOnValidInput(): void {
 // Handles call button action: creates peer connection.
 function callAction(): void {
     room = roomInput.value.trim();
-    socket.emit(socketMessages.createOrJoinRoom, room);
+    socket.emit(SocketMessages.createOrJoinRoom, room);
     callButton.disabled = true;
     hangupButton.disabled = false;
 }
@@ -355,14 +323,17 @@ function handleConnection(event: RTCPeerConnectionIceEvent): void {
             label: iceCandidate.sdpMLineIndex
         };
 
-        socket.emit(socketMessages.iceCandidate, candidateMsg, room);
+        socket.emit(SocketMessages.iceCandidate, candidateMsg, room);
 
         console.log(`viewer ICE candidate:\n${iceCandidate.candidate}.`);
     }
 }
 
 function receivedRemoteIceCandidate(rTCIceCandidateInit: IIceCandidateMsg): void {
-    if (rTCIceCandidateInit !== undefined) {
+    // if (pc2.remoteDescription !== null && evt.candidate !== null)
+    //want to make sure remote description is set and that the candidate is not null
+    //(the last one will be null to indicate it being the last candidate for that signalling period)
+    if (rTCIceCandidateInit.candidate.trim().length !== 0) {
 
         const newIceCandidate: RTCIceCandidate = new RTCIceCandidate({
             candidate: rTCIceCandidateInit.candidate,
@@ -453,7 +424,7 @@ function createdAnswer(description: RTCSessionDescriptionInit): void {
             .catch(setSessionDescriptionError);
     }
 
-    socket.emit(socketMessages.answer, description, room);
+    socket.emit(SocketMessages.answer, description, room);
 }
 
 // Logs success when setting session description.
