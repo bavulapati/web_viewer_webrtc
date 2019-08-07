@@ -23,6 +23,14 @@ class SocketListeners {
     public addAll(socket: SocketIOClient.Socket, room: string): void {
         console.log('adding all socket listeners');
 
+        socket.on('connect', () => {
+            console.log('socket connected');
+        });
+
+        socket.on('disconnect', () => {
+            console.log('socket disconnected.');
+        });
+
         socket.on(SocketMessages.message, (statement: string) => { console.log(statement); });
 
         socket.on(SocketMessages.serverList, (servers: IBmrServer[]) => {

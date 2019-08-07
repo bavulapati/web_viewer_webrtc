@@ -1,3 +1,8 @@
+
+let remoteStream: MediaStream;
+let remotePeerConnection: RTCPeerConnection | undefined;
+let receiveChannel: RTCDataChannel;
+
 const remoteVideo: HTMLVideoElement = <HTMLVideoElement>document.querySelector('video');
 // Define and add behavior to buttons.
 // Define action buttons.
@@ -43,4 +48,25 @@ function hangupAction(): void {
     console.log('Ending call.');
     // tslint:disable-next-line: no-null-keyword
     remoteVideo.srcObject = null;
+}
+
+function disableRemoteMouseAndKeyBoard(): void {
+    remoteVideo.removeEventListener('mousemove', (ev: MouseEvent) => {
+        sendMouseMove(ev);
+    });
+    remoteVideo.removeEventListener('mousedown', (ev: MouseEvent) => {
+        sendMouseDown(ev);
+    });
+    remoteVideo.removeEventListener('mouseup', (ev: MouseEvent) => {
+        sendMouseUp(ev);
+    });
+    remoteVideo.removeEventListener('keydown', (ev: KeyboardEvent) => {
+        sendKeyDown(ev);
+    });
+    remoteVideo.removeEventListener('keyup', (ev: KeyboardEvent) => {
+        sendKeyUp(ev);
+    });
+    remoteVideo.removeEventListener('wheel', (ev: WheelEvent) => {
+        console.log('wheel');
+    });
 }
