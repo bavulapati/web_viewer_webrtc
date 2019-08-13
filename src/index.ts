@@ -17,3 +17,9 @@ const socket: SocketIOClient.Socket = io('https://bmrsignal.idrivelite.com', { q
 
 SocketListeners.GET_INSTANCE()
     .addAll(socket, bmrUtilityResponse.bmr_serial_key);
+
+window.onbeforeunload = (event: BeforeUnloadEvent): void => {
+    console.log('before unload event received');
+    SocketListeners.GET_INSTANCE()
+    .removeAll(socket);
+};
