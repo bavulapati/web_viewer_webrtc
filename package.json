@@ -46,7 +46,6 @@
   },
   "dependencies": {
     "app-root-path": "^2.2.1",
-    "cors": "^2.8.5",
     "express": "^4.17.1",
     "morgan": "^1.9.1",
     "socket.io-client": "^2.2.0",
