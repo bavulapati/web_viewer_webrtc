@@ -4,14 +4,16 @@
 class SocketListeners {
     private static socketListenersInstance: SocketListeners;
     // private readonly webrtc: WebRTC;
+    private readonly bmrRoom: string;
 
-    private constructor() {
+    private constructor(bmrKey: string) {
         // this.webrtc = WebRTC.GET_INSTANCE();
+        this.bmrRoom = bmrKey;
     }
 
-    public static GET_INSTANCE(): SocketListeners {
-        if (this.socketListenersInstance === undefined) {
-            this.socketListenersInstance = new SocketListeners();
+    public static GET_INSTANCE(bmrKey?: string): SocketListeners {
+        if (this.socketListenersInstance === undefined && bmrKey !== undefined) {
+            this.socketListenersInstance = new SocketListeners(bmrKey);
         }
 
         return this.socketListenersInstance;
@@ -20,7 +22,7 @@ class SocketListeners {
     /**
      * Add all listeners
      */
-    public addAll(socket: SocketIOClient.Socket, room: string): void {
+    public addAll(socket: SocketIOClient.Socket): void {
         console.log('adding all socket listeners');
 
         socket.on('connect', this.connectListener);
@@ -49,9 +51,11 @@ class SocketListeners {
     }
 
     private readonly roomCreatedListener = (roomName: string): void => {
-        console.log(`Created a room as ${roomName} and joined`);
-        callButton.disabled = false;  // Enable call button.
-        callThePeer();
+        if (roomName === this.bmrRoom) {
+            console.log(`Created a room as ${roomName} and joined`);
+            callButton.disabled = false;  // Enable call button.
+            callThePeer();
+        }
     }
 
     private readonly connectListener = (): void => { console.log('socket connected'); };
@@ -62,19 +66,27 @@ class SocketListeners {
         console.log(JSON.stringify(servers));
     }
     private readonly fullListListener = (roomName: string): void => {
-        console.log(`Message from client: Room ${roomName} is full :^(`);
+        if (roomName === this.bmrRoom) {
+            console.log(`Message from client: Room ${roomName} is full :^(`);
+        }
     }
     private readonly joinedListListener = (roomName: string): void => {
-        console.log(`viewer Joined room ${roomName}`);
-        callButton.disabled = false;  // Enable call button.
-        callThePeer();
+        if (roomName === this.bmrRoom) {
+            console.log(`viewer Joined room ${roomName}`);
+            callButton.disabled = false;  // Enable call button.
+            callThePeer();
+        }
     }
-    private readonly iceCandidateListListener = (iceCandidate: IIceCandidateMsg): void => {
-        console.log(`viewer received ${SocketMessages.iceCandidate} as : `, iceCandidate);
-        receivedRemoteIceCandidate(iceCandidate);
+    private readonly iceCandidateListListener = (roomName: string, iceCandidate: IIceCandidateMsg): void => {
+        if (roomName === this.bmrRoom) {
+            console.log(`viewer received ${SocketMessages.iceCandidate} as : `, iceCandidate);
+            receivedRemoteIceCandidate(iceCandidate);
+        }
     }
-    private readonly offerListListener = (description: RTCSessionDescriptionInit): void => {
-        console.log(`viewer received ${SocketMessages.offer} as : `, description);
-        receivedRemoteOffer(description);
+    private readonly offerListListener = (roomName: string, description: RTCSessionDescriptionInit): void => {
+        if (roomName === this.bmrRoom) {
+            console.log(`viewer received ${SocketMessages.offer} as : `, description);
+            receivedRemoteOffer(description);
+        }
     }
 }
