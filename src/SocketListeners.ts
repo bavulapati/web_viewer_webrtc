@@ -30,10 +30,10 @@ class SocketListeners {
         socket.on(SocketMessages.message, this.messageListener);
         socket.on(SocketMessages.serverList, this.serverListListener);
         socket.on(SocketMessages.created, this.roomCreatedListener);
-        socket.on(SocketMessages.full, this.fullListListener);
-        socket.on(SocketMessages.joined, this.joinedListListener);
-        socket.on(SocketMessages.iceCandidate, this.iceCandidateListListener);
-        socket.on(SocketMessages.offer, this.offerListListener);
+        socket.on(SocketMessages.full, this.fullListener);
+        socket.on(SocketMessages.joined, this.joinedListener);
+        socket.on(SocketMessages.iceCandidate, this.iceCandidateListener);
+        socket.on(SocketMessages.offer, this.offerListener);
     }
 
     public removeAll(socket: SocketIOClient.Socket): void {
@@ -42,10 +42,10 @@ class SocketListeners {
         socket.off(SocketMessages.message, this.messageListener);
         socket.off(SocketMessages.serverList, this.serverListListener);
         socket.off(SocketMessages.created, this.roomCreatedListener);
-        socket.off(SocketMessages.full, this.fullListListener);
-        socket.off(SocketMessages.joined, this.joinedListListener);
-        socket.off(SocketMessages.iceCandidate, this.iceCandidateListListener);
-        socket.off(SocketMessages.offer, this.offerListListener);
+        socket.off(SocketMessages.full, this.fullListener);
+        socket.off(SocketMessages.joined, this.joinedListener);
+        socket.off(SocketMessages.iceCandidate, this.iceCandidateListener);
+        socket.off(SocketMessages.offer, this.offerListener);
 
         console.log('removed listeners');
     }
@@ -65,25 +65,25 @@ class SocketListeners {
         console.log('on serverlist');
         console.log(JSON.stringify(servers));
     }
-    private readonly fullListListener = (roomName: string): void => {
+    private readonly fullListener = (roomName: string): void => {
         if (roomName === this.bmrRoom) {
             console.log(`Message from client: Room ${roomName} is full :^(`);
         }
     }
-    private readonly joinedListListener = (roomName: string): void => {
+    private readonly joinedListener = (roomName: string): void => {
         if (roomName === this.bmrRoom) {
             console.log(`viewer Joined room ${roomName}`);
             callButton.disabled = false;  // Enable call button.
             callThePeer();
         }
     }
-    private readonly iceCandidateListListener = (roomName: string, iceCandidate: IIceCandidateMsg): void => {
+    private readonly iceCandidateListener = (roomName: string, iceCandidate: IIceCandidateMsg): void => {
         if (roomName === this.bmrRoom) {
             console.log(`viewer received ${SocketMessages.iceCandidate} as : `, iceCandidate);
             receivedRemoteIceCandidate(iceCandidate);
         }
     }
-    private readonly offerListListener = (roomName: string, description: RTCSessionDescriptionInit): void => {
+    private readonly offerListener = (roomName: string, description: RTCSessionDescriptionInit): void => {
         if (roomName === this.bmrRoom) {
             console.log(`viewer received ${SocketMessages.offer} as : `, description);
             receivedRemoteOffer(description);
