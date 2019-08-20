@@ -15,7 +15,7 @@ const connectionQuery: IConnectionQuery = {
 let room: string;
 const socket: SocketIOClient.Socket = io('https://bmrsignal.idrivelite.com', { query: connectionQuery });
 
-SocketListeners.GET_INSTANCE(bmrUtilityResponse.bmr_serial_key)
+SocketListeners.GET_INSTANCE(/*bmrUtilityResponse.bmr_serial_key*/)
     .addAll(socket);
 
 window.onbeforeunload = (event: BeforeUnloadEvent): void => {

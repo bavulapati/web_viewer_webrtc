@@ -4,16 +4,16 @@
 class SocketListeners {
     private static socketListenersInstance: SocketListeners;
     // private readonly webrtc: WebRTC;
-    private readonly bmrRoom: string;
+    // private readonly bmrRoom: string;
 
-    private constructor(bmrKey: string) {
+    private constructor(/*bmrKey: string*/) {
         // this.webrtc = WebRTC.GET_INSTANCE();
-        this.bmrRoom = bmrKey;
+        // this.bmrRoom = bmrKey;
     }
 
-    public static GET_INSTANCE(bmrKey?: string): SocketListeners {
-        if (this.socketListenersInstance === undefined && bmrKey !== undefined) {
-            this.socketListenersInstance = new SocketListeners(bmrKey);
+    public static GET_INSTANCE(/*bmrKey?: string*/): SocketListeners {
+        if (this.socketListenersInstance === undefined/* && bmrKey !== undefined*/) {
+            this.socketListenersInstance = new SocketListeners(/*bmrKey*/);
         }
 
         return this.socketListenersInstance;
@@ -51,7 +51,7 @@ class SocketListeners {
     }
 
     private readonly roomCreatedListener = (roomName: string): void => {
-        if (roomName === this.bmrRoom) {
+        if (roomName === room) {
             console.log(`Created a room as ${roomName} and joined`);
             callButton.disabled = false;  // Enable call button.
             callThePeer();
@@ -66,25 +66,25 @@ class SocketListeners {
         console.log(JSON.stringify(servers));
     }
     private readonly fullListener = (roomName: string): void => {
-        if (roomName === this.bmrRoom) {
+        if (roomName === room) {
             console.log(`Message from client: Room ${roomName} is full :^(`);
         }
     }
     private readonly joinedListener = (roomName: string): void => {
-        if (roomName === this.bmrRoom) {
+        if (roomName === room) {
             console.log(`viewer Joined room ${roomName}`);
             callButton.disabled = false;  // Enable call button.
             callThePeer();
         }
     }
     private readonly iceCandidateListener = (roomName: string, iceCandidate: IIceCandidateMsg): void => {
-        if (roomName === this.bmrRoom) {
+        if (roomName === room) {
             console.log(`viewer received ${SocketMessages.iceCandidate} as : `, iceCandidate);
             receivedRemoteIceCandidate(iceCandidate);
         }
     }
     private readonly offerListener = (roomName: string, description: RTCSessionDescriptionInit): void => {
-        if (roomName === this.bmrRoom) {
+        if (roomName === room) {
             console.log(`viewer received ${SocketMessages.offer} as : `, description);
             receivedRemoteOffer(description);
         }
