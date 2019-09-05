@@ -207,6 +207,7 @@ function enableRemoteMouseAndKeyBoard(): void {
         sendKeyUp(ev);
     },                        true);
     remoteVideo.addEventListener('wheel', (ev: WheelEvent) => {
-        console.log('wheel');
+        ev.preventDefault();
+        sendWheelMovement(ev);
     });
 }

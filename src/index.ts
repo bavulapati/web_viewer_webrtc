@@ -22,4 +22,5 @@ window.onbeforeunload = (event: BeforeUnloadEvent): void => {
     console.log('before unload event received');
     SocketListeners.GET_INSTANCE()
     .removeAll(socket);
+    hangupAction();
 };

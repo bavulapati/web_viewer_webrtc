@@ -67,6 +67,7 @@ function disableRemoteMouseAndKeyBoard(): void {
         sendKeyUp(ev);
     });
     remoteVideo.removeEventListener('wheel', (ev: WheelEvent) => {
-        console.log('wheel');
+        ev.preventDefault();
+        sendWheelMovement(ev);
     });
 }
