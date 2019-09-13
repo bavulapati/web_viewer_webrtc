@@ -18,9 +18,13 @@ const socket: SocketIOClient.Socket = io('https://bmrsignal.idrivelite.com', { q
 SocketListeners.GET_INSTANCE(/*bmrUtilityResponse.bmr_serial_key*/)
     .addAll(socket);
 
-window.onbeforeunload = (event: BeforeUnloadEvent): void => {
-    console.log('before unload event received');
+window.addEventListener('beforeunload', (event: BeforeUnloadEvent) => {
+    console.log('before dialog');
+    event.returnValue = 'Do you want to close the session?..';
+  });
+window.addEventListener('unload', (event: Event) => {
+    console.log('after dialog');
     SocketListeners.GET_INSTANCE()
     .removeAll(socket);
     hangupAction();
-};
+  });
