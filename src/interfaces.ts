@@ -25,6 +25,7 @@ interface IBmrUtilityResponse {
 interface IConnectionQuery {
     accessToken: string;
     userName: string;
+    isHost: boolean;
 }
 
 interface IBmrServer {

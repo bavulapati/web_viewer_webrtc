@@ -4,7 +4,7 @@
 <head>
   <meta charset="UTF-8">
 
-  <title>WebRTC display</title>
+  <title>BMR Remote Console</title>
 
   <link rel="stylesheet" href="/css/index.css" />
 
@@ -12,11 +12,16 @@
 
 <body>
 
-  <!-- <p>Web Viewer ready to connect</p> -->
+  <div id="loader_wrapper" class="loader_wrapper">
+    <div class="lw_inner">
+        <div class="loader"></div>
+        <p> Loading screen...</p>
+      </div>
+  </div>
 
   <video autoplay playsinline></video>
 
-  <div>
+  <div style="display: none">
     <input type="text" id="roomName" placeholder="BMR Unique Serial ID" />
     <button id="callButton">Connect</button>
     <button id="hangupButton">Disconnect</button>

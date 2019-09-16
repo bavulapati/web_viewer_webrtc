@@ -19,6 +19,12 @@ roomInput.addEventListener('input', enableCallButtionOnValidInput);
 callButton.addEventListener('click', callAction);
 hangupButton.addEventListener('click', hangupAction);
 
+const loaderWrapper: HTMLDivElement = <HTMLDivElement>document.getElementById('loader_wrapper');
+remoteVideo.onplaying = (): void => {
+    remoteVideo.style.display = 'block';
+    loaderWrapper.style.display = 'none';
+};
+
 function enableCallButtionOnValidInput(): void {
     if (roomInput.value.trim().length > 7) {
         callButton.disabled = false;

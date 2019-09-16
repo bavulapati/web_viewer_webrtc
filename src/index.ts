@@ -9,7 +9,8 @@ const bmrUtilityResponse: IBmrUtilityResponse = {
 
 const connectionQuery: IConnectionQuery = {
     accessToken: bmrUtilityResponse.access_token,
-    userName: bmrUtilityResponse.user_name
+    userName: bmrUtilityResponse.user_name,
+    isHost: false
 };
 
 let room: string;
